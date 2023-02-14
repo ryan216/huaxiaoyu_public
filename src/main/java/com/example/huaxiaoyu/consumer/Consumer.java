@@ -2,6 +2,7 @@ package com.example.huaxiaoyu.consumer;
 
 import com.alibaba.fastjson.JSONObject;
 import com.example.huaxiaoyu.domain.User;
+import com.example.huaxiaoyu.domain.friends.Friends;
 import com.example.huaxiaoyu.service.Impl.MessageServiceImpl;
 import com.example.huaxiaoyu.service.Impl.UserServiceImpl;
 import com.example.huaxiaoyu.utils.RedisCache;
@@ -16,6 +17,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -151,6 +153,7 @@ public class Consumer{
             redisCache.deleteObject(sendId);
         }
         if("message".equals(event)){
+
             System.out.println(data.get("data"));
             JSONObject data1 = (JSONObject) data.get("data");
             Integer receiveId= data1.getInteger("receiveId");
@@ -159,6 +162,22 @@ public class Consumer{
 //                this.session.getAsyncRemote().sendText(message);
             }
 
+        if("friend-apply".equals(event)||"friend-reply".equals(event)){
+            Integer receiveId= data.getInteger("receiveId");
+            if("friend-reply".equals(event)){
+                Integer result = data.getInteger("result");
+
+                if(result==1){
+                    Friends  f =new Friends();
+                    f.setSendId(Integer.valueOf(sendId));
+                    f.setReceiveId(receiveId);
+                    f.setStatus(1);
+                    f.setCreateTime(new Date());
+                }
+            }
+            users.get(receiveId).session.getAsyncRemote().sendText(message);
+
+        }
     }
     /**
      * 发生错误时调用
