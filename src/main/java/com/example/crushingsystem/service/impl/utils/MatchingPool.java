@@ -35,12 +35,14 @@ public class MatchingPool extends Thread {
     public void addPlayer(Integer userId,String sex) {
         lock.lock();
         try {
+            System.out.println("当前匹配池人数"+players.size());
             Boolean flag=true;
             for(Player p:players){
                 if(p.getUserId()==userId){
                     flag=false;
                 }
             }
+//            flag=true;  //改
             if(flag==true){
                 players.add(new Player(userId, sex, 0));
             }
@@ -78,6 +80,7 @@ public class MatchingPool extends Thread {
             return true;
         }
         return false;
+//        return true;
     }
 
     private void sendResult(Player a, Player b) {  // 返回匹配结果
