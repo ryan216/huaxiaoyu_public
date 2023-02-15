@@ -12,5 +12,6 @@ redis:
 
 # 后端服务
 1.maven打包后 java -jar方式运行即可
-2.两个服务，hauxioayu 和 crushingsystem均需单独以方式1开启服务
+2.源码位于huaxiaoyu分支和crushing_system分支
+3.两个服务hauxioayu和crushingsystem均需单独以方式1开启服务
 
