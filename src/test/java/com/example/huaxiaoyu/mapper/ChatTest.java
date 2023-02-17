@@ -1,8 +1,12 @@
 //package com.example.huaxiaoyu.mapper;
 //
+//import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 //import com.example.huaxiaoyu.domain.User;
 //import com.example.huaxiaoyu.domain.chat.Assistedchat;
+//import com.example.huaxiaoyu.domain.friends.Friends;
 //import com.example.huaxiaoyu.mapper.chat.AssistedChatMapper;
+//import com.example.huaxiaoyu.service.Impl.friends.FriendsServiceImpl;
+//import com.example.huaxiaoyu.service.friends.FriendsService;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,9 @@
 //    @Autowired
 //    private AssistedChatMapper assistedChatMapper;
 //
+//    @Autowired
+//    private FriendsServiceImpl friendsServiceimpl;
+//
 //    @Test
 //    public  void add() throws IOException {
 //        FileReader file =new FileReader("D:\\java_projects\\huaxiaoyucloud\\huaxiaoyu\\src\\test\\java\\com\\example\\huaxiaoyu\\mapper\\辅助聊天.txt");
@@ -48,6 +55,27 @@
 //
 ////            System.out.println(s);
 //        }
+//    }
 //
+//    @Test
+//    public void test2(){
+//        Boolean isFriend=false;
+//
+//        LambdaQueryWrapper<Friends> wrapper1 =new LambdaQueryWrapper<>();
+//        wrapper1.eq(Friends::getSendId,367);
+//        wrapper1.eq(Friends::getReceiveId,369);
+//        wrapper1.eq(Friends::getStatus,1);
+//        List<Friends> isfriend1 = friendsServiceimpl.list(wrapper1);
+//
+//        LambdaQueryWrapper<Friends> wrapper2 =new LambdaQueryWrapper<>();
+//        wrapper2.eq(Friends::getSendId,369);
+//        wrapper2.eq(Friends::getReceiveId,367);
+//        wrapper2.eq(Friends::getStatus,1);
+//        List<Friends> isfriend2 = friendsServiceimpl.list(wrapper1);
+//
+//        if(!isfriend1.isEmpty()||!isfriend2.isEmpty()){
+//            isFriend=true;
+//        }
+//        System.out.println(isFriend);
 //    }
 //}

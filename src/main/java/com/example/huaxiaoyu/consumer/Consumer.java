@@ -1,10 +1,13 @@
 package com.example.huaxiaoyu.consumer;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.huaxiaoyu.domain.Message;
 import com.example.huaxiaoyu.domain.User;
 import com.example.huaxiaoyu.domain.friends.Friends;
 import com.example.huaxiaoyu.service.Impl.MessageServiceImpl;
 import com.example.huaxiaoyu.service.Impl.UserServiceImpl;
+import com.example.huaxiaoyu.service.Impl.friends.FriendsServiceImpl;
 import com.example.huaxiaoyu.utils.RedisCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +21,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,6 +51,8 @@ public class Consumer{
 
     public  static RestTemplate restTemplate;
 
+    public  static FriendsServiceImpl friendsServiceimpl;
+
     private final static String addUserUrl = "http://127.0.0.1:9093/user/add/";
     private final static String removeUserUrl = "http://127.0.0.1:9093/user/remove/";
 
@@ -71,6 +77,12 @@ public class Consumer{
     @Autowired
     public void setRestTemplate(RestTemplate restTemplate) {
         Consumer.restTemplate = restTemplate;
+    }
+
+
+    @Autowired
+    public  void setFriendsService(FriendsServiceImpl friendsServiceimpl){
+        Consumer.friendsServiceimpl=friendsServiceimpl;
     }
 
 
@@ -131,11 +143,22 @@ public class Consumer{
             stopMatching();
             this.session.getAsyncRemote().sendText("stop matching success");
         }
+
+        //对方id获取
         String sendId=this.user.getId().toString();
 //        System.out.println(sendId);
-        String bId=redisCache.getCacheObject(sendId);
-        User userB = userService.getById(bId);
+
+
+
+
+
+        // 开始聊天
         if(redisCache.getCacheObject(sendId)!=null){
+
+            String bId=redisCache.getCacheObject(sendId);
+            User userB = userService.getById(bId);
+            Boolean isFriend = friendsServiceimpl.isFriend(this.user.getId(), userB.getId());
+
             JSONObject resp=new JSONObject();
             resp.put("event", "start-chat");
             JSONObject resp_data=new JSONObject();
@@ -147,37 +170,68 @@ public class Consumer{
             opponent.put("interestCodeList", userB.getInterestCodeList());
             opponent.put("headPhoto",userB.getHeadPhoto());
             resp_data.put("opponent",opponent);
+            resp_data.put("isFriend",isFriend);
             resp.put("data", resp_data);
             resp.put("flag",true);
             this.session.getAsyncRemote().sendText(resp.toJSONString());
             redisCache.deleteObject(sendId);
         }
-        if("message".equals(event)){
+
+
+
+        if("message".equals(event)||"friend-apply".equals(event)||"friend-reply".equals(event)){
 
             System.out.println(data.get("data"));
             JSONObject data1 = (JSONObject) data.get("data");
             Integer receiveId= data1.getInteger("receiveId");
-//            System.out.println(receiveId);
-            users.get(receiveId).session.getAsyncRemote().sendText(message);
-//                this.session.getAsyncRemote().sendText(message);
+            Integer sendID= data1.getInteger("sendId");
+
+            if("message".equals(event)){
+
+                Message message1= new Message();
+                message1.setSendId(sendID);
+                message1.setReceviceId(receiveId);
+                message1.setSendText(message);
+                message1.setCreateTime(new Date());
+                messageService.save(message1);
+
+                users.get(receiveId).session.getAsyncRemote().sendText(message);
             }
 
-        if("friend-apply".equals(event)||"friend-reply".equals(event)){
-            Integer receiveId= data.getInteger("receiveId");
-            if("friend-reply".equals(event)){
-                Integer result = data.getInteger("result");
+            if("friend-apply".equals(event)){
+                if(friendsServiceimpl.isFriend(sendID,receiveId)){
+                    JSONObject resp=new JSONObject();
+                    resp.put("event", "error");
+                    resp.put("flag",true);
+                    JSONObject resp_data=new JSONObject();
+                    resp_data.put("msg","对方已经是您的好友，请勿重复添加！");
+                    resp.put("data",resp_data);
+                    this.session.getAsyncRemote().sendText(resp.toJSONString());
+                }
+                else{
+                    users.get(receiveId).session.getAsyncRemote().sendText(message);
+                }
 
+            }
+                //保存朋友记录
+            if("friend-reply".equals(event)){
+                Integer result = data1.getInteger("result");
                 if(result==1){
                     Friends  f =new Friends();
-                    f.setSendId(Integer.valueOf(sendId));
+                    f.setSendId(sendID);
                     f.setReceiveId(receiveId);
                     f.setStatus(1);
                     f.setCreateTime(new Date());
+                    friendsServiceimpl.save(f);
                 }
+                users.get(receiveId).session.getAsyncRemote().sendText(message);
             }
-            users.get(receiveId).session.getAsyncRemote().sendText(message);
 
-        }
+
+//                this.session.getAsyncRemote().sendText(message);
+            }
+
+
     }
     /**
      * 发生错误时调用

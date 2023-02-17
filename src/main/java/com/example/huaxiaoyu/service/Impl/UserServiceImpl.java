@@ -10,7 +10,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.huaxiaoyu.domain.Interest;
 import com.example.huaxiaoyu.domain.LoginUser;
 import com.example.huaxiaoyu.domain.User;
+import com.example.huaxiaoyu.domain.friends.Friends;
 import com.example.huaxiaoyu.mapper.UserMapper;
+import com.example.huaxiaoyu.mapper.friends.FriendsMapper;
 import com.example.huaxiaoyu.service.UserService;
 import com.example.huaxiaoyu.utils.JwtUtil;
 import com.example.huaxiaoyu.utils.R;
@@ -41,6 +43,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Autowired
     private RedisCache redisCache;
+
 
 //    @Override
 //    public R login(User user) {
@@ -159,11 +162,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         //解析token
 
-
         String userid;
         String token = null;
         try {
-
             String []tokens=authorization.split(" ");
             if(tokens.length>1){
                 token = tokens[1];
@@ -181,6 +182,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         return new R("用户信息获取成功！",user,true);
     }
+
+
 
 
 }

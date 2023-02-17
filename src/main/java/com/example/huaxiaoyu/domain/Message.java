@@ -15,17 +15,15 @@ import java.util.Date;
 public class Message {
     private Long id;
 
-    String sendName;
+    Integer sendId;
 
-    String receviceName;
+    Integer receviceId;
 
     String sendText;
 
     Date createTime;
 
-    Date updateTime;
-
-    Integer chatmState;
+    Integer status;
 
     Integer TextType;
 

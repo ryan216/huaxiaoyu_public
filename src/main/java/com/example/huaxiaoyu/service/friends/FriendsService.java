@@ -13,6 +13,12 @@ import java.util.List;
  * @Version: 1.0
  */
 public interface FriendsService extends IService<Friends> {
-    public List<User> get(Integer userId);
+    public List<User> get();
+
+    public  Boolean isFriend(Integer AId,Integer BId);
+
+    public Boolean delete(Integer BId);
+
+    public  Boolean add(Integer BId);
 
 }
