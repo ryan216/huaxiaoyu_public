@@ -176,9 +176,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return new R("token非法",false);
         }
 
-        String redisKey = "login:" + userid;
-        LoginUser loginUser = redisCache.getCacheObject(redisKey);
-        User user = loginUser.getUser();
+//        String redisKey = "login:" + userid;
+//        LoginUser loginUser = redisCache.getCacheObject(redisKey);
+//        User user = loginUser.getUser();
+        User user = userMapper.selectById(userid);
 
         return new R("用户信息获取成功！",user,true);
     }

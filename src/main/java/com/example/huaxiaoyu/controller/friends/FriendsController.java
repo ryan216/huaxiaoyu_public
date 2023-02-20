@@ -1,5 +1,6 @@
 package com.example.huaxiaoyu.controller.friends;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.huaxiaoyu.domain.LoginUser;
 import com.example.huaxiaoyu.domain.User;
@@ -52,7 +53,10 @@ public class FriendsController {
     @GetMapping("/friend/getFriendList")
     public R get(){
         List<User> users = friendsService.get();
-        return new R("朋友查询成功",users,true);
+        HashMap<String,List<User>> res =new HashMap<>();
+        res.put("friendList",users);
+
+        return new R("朋友查询成功",res,true);
     }
     
     /**
@@ -70,14 +74,15 @@ public class FriendsController {
     }
 
     /**
-     * @param receiveId:
      * @return R
      * @author
      * @description 删除好友
      * @date 2023/2/16 9:27
      */
     @PostMapping("/friend/deleteFriend")
-    public  R delete(@RequestParam("opponentId") Integer receiveId){
+    public  R delete(@RequestBody String jsonString){
+        JSONObject data =JSONObject.parseObject(jsonString);
+        Integer receiveId =  data.getInteger("opponentId");
         noticeService.add(receiveId,0,null);
 
         Boolean flag2 = friendsService.delete(receiveId);
@@ -91,15 +96,12 @@ public class FriendsController {
 
     }
 
-    /**
-     * @param receiveId:
-     * @return R
-     * @author
-     * @description 添加好友
-     * @date 2023/2/16 9:27
-     */
+
     @PostMapping("/friend/applyFriend")
-    public  R applyFriend(@RequestParam("opponentId") Integer receiveId){
+    public  R applyFriend( @RequestBody String jsonString){
+//    @RequestParam("opponentId") Integer receiveId)
+        JSONObject data =JSONObject.parseObject(jsonString);
+        Integer receiveId =  data.getInteger("opponentId");
         Boolean flag = noticeService.add(receiveId, 1, null);
 
         HashMap<String,Boolean> res =new HashMap<String, Boolean>();
@@ -113,18 +115,18 @@ public class FriendsController {
 
 
     /**
-     * @param messageId:
-     * @param opponentId:
-     * @param result:
      * @return R
      * @author
      * @description 同意好友申请
      * @date 2023/2/16 9:26
      */
     @PostMapping("/message/replyFriend")
-    public  R replyFriend(@RequestParam("messageId") Integer messageId,
-                  @RequestParam("opponentId") Integer opponentId,
-                  @RequestParam("result") Integer result){
+    public  R replyFriend(@RequestBody String jsonString
+){
+        JSONObject data =JSONObject.parseObject(jsonString);
+        Integer messageId =data.getInteger("messageId");
+        Integer opponentId =data.getInteger("opponentId");
+        Integer result =data.getInteger("result");
         Notice notice = noticeService.getById(messageId);
         notice.setStatus(1);
         boolean flag1 = noticeService.updateById(notice);
@@ -145,7 +147,9 @@ public class FriendsController {
     }
 
     @PostMapping("/friend/applyPhoneNum")
-    public  R applyPhoneNum(@RequestParam("opponentId") Integer opponentId) {
+    public  R applyPhoneNum(@RequestBody String jsonString) {
+        JSONObject data =JSONObject.parseObject(jsonString);
+        Integer opponentId =  data.getInteger("opponentId");
         Boolean flag = noticeService.add(opponentId, 3, null);
         HashMap<String,Boolean> res =new HashMap<String, Boolean>();
         res.put("isSuccess",flag);
@@ -157,18 +161,18 @@ public class FriendsController {
 
     }
     /**
-     * @param messageId:
-     * @param opponentId:
-     * @param result:
      * @return R
      * @author
      * @description 回复申请获取联系方式
      * @date 2023/2/16 14:56
      */
     @PostMapping("/message/replyPhoneNum")
-    public  R replyPhoneNum(@RequestParam("messageId") Integer messageId,
-                            @RequestParam("opponentId") Integer opponentId,
-                            @RequestParam("result") Integer result){
+    public  R replyPhoneNum(@RequestBody String jsonString){
+
+        JSONObject data =JSONObject.parseObject(jsonString);
+        Integer messageId =data.getInteger("messageId");
+        Integer opponentId =data.getInteger("opponentId");
+        Integer result =data.getInteger("result");
         Notice notice = noticeService.getById(messageId);
         notice.setStatus(1);
         boolean flag1 = noticeService.updateById(notice);
@@ -185,14 +189,15 @@ public class FriendsController {
     }
     
     /**
-     * @param messageId: 
      * @return R 
      * @author 
      * @description 修改消息的已读状态
      * @date 2023/2/16 14:57
      */
     @PostMapping("/message/updateStatusOfMsg")
-    public  R updateStatusOfDeleteMsg(@RequestParam("messageId") Integer messageId){
+    public  R updateStatusOfDeleteMsg(@RequestBody String jsonString){
+        JSONObject data =JSONObject.parseObject(jsonString);
+        Integer messageId =data.getInteger("messageId");
         Notice notice = noticeService.getById(messageId);
         notice.setStatus(1);
         boolean flag = noticeService.updateById(notice);
@@ -205,12 +210,20 @@ public class FriendsController {
         return new R("修改好友消息的已读状态失败！",res,true);
     }
 
-//
+    
+    /**
+     * @param : 
+     * @return R 
+     * @author 
+     * @description 获取聊天记录列表
+     * @date 2023/2/19 10:49
+     */
     @GetMapping("/record/getRecordList")
     public  R getRecordList(){
         HashMap<String,List<HashMap<String, Object>>> res=new HashMap<>();
         List<HashMap<String, Object>> res1 = messageService.get_records();
         res.put("recordList",res1);
+
         return new R("聊天记录列表获取成功",res,true);
 
     }

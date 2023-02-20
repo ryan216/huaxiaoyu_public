@@ -19,4 +19,6 @@ public interface NoticeService extends IService<Notice> {
 
 
     public  Boolean add(Integer receiveId,Integer type,Integer result);
+
+    public  Notice getByMessageId(Integer messageId);
 }

@@ -45,13 +45,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
 
 
-
         List<User> users =new ArrayList<>();
+        List<Integer> users_id =new ArrayList<>();
+
 
         List<HashMap<String,Object>> res_final =new ArrayList<>();
         LambdaQueryWrapper<Message> wrapper1 =new LambdaQueryWrapper<>();
         wrapper1.eq(Message::getSendId,userId);
         List<Message> message_send = messageMapper.selectList(wrapper1);
+
 
         LambdaQueryWrapper<Message> wrapper2 =new LambdaQueryWrapper<>();
         wrapper2.eq(Message::getReceviceId,userId);
@@ -59,24 +61,27 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
         for(Message message:message_receive){
             User user = userMapper.selectById(message.getSendId());
-            if(!users.contains(user)){
+            if(!users_id.contains(user.getId())){
                 users.add(user);
+                users_id.add(user.getId());
                 HashMap<String,Object> res = new HashMap<>();
                 user.setPassword(null);
                 res.put("opponent",user);
-                res.put("dateTime",message.getCreateTime().toString());
+                res.put("createdAt",message.getCreateTime());
+                res.put("recordId",message.getId());
                 res.put("isFriend",friendsService.isFriend(userId,user.getId()));
                 res_final.add(res);
             }
         }
         for(Message message:message_send){
             User user = userMapper.selectById(message.getReceviceId());
-            if(!users.contains(user)){
+            if(!users_id.contains(user.getId())){
                 users.add(user);
                 HashMap<String,Object> res = new HashMap<>();
                 user.setPassword(null);
                 res.put("opponent",user);
-                res.put("dateTime",message.getCreateTime().toString());
+                res.put("createdAt",message.getCreateTime());
+                res.put("recordId",message.getId());
                 res.put("isFriend",friendsService.isFriend(userId,user.getId()));
                 res_final.add(res);
             }

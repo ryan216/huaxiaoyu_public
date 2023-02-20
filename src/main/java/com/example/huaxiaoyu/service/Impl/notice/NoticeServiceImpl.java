@@ -51,13 +51,15 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
         List<HashMap<String,Object>> res_receive=new ArrayList<>();
 
 
-        LambdaQueryWrapper<Notice> wrapper= new LambdaQueryWrapper<>();
-        wrapper.eq(Notice::getReceiveId,userId);
-        List<Notice> notices_receive = noticeMapper.selectList(wrapper);
-
         LambdaQueryWrapper<Notice> wrapper1= new LambdaQueryWrapper<>();
-        wrapper.eq(Notice::getSendId,userId);
-        List<Notice> notices_send = noticeMapper.selectList(wrapper1);
+        wrapper1.eq(Notice::getReceiveId,userId);
+        wrapper1.orderByDesc(Notice::getId);
+        List<Notice> notices_receive = noticeMapper.selectList(wrapper1);
+
+        LambdaQueryWrapper<Notice> wrapper2= new LambdaQueryWrapper<>();
+        wrapper2.eq(Notice::getSendId,userId);
+        wrapper2.orderByDesc(Notice::getId);
+        List<Notice> notices_send = noticeMapper.selectList(wrapper2);
 
 
 
@@ -111,5 +113,10 @@ public class NoticeServiceImpl extends ServiceImpl<NoticeMapper, Notice>
         }
         return false;
 
+    }
+
+    @Override
+    public Notice getByMessageId(Integer messageId) {
+        return noticeMapper.getByMessageId(messageId);
     }
 }

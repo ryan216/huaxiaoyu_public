@@ -50,23 +50,23 @@ public class AssistedChatController {
 
         User user2 =userService.getById(sendId);
         String interestCodeList2 = user2.getInterestCodeList();
-        if(interestCodeList1.contains("0000") && interestCodeList2.contains("0000")){
+        if(interestCodeList1.startsWith("00") && interestCodeList2.startsWith("00")){
             s1=1;
         }
-        if(interestCodeList1.contains("0100") && interestCodeList2.contains("0100")){
+        if(interestCodeList1.startsWith("01") && interestCodeList2.startsWith("01")){
             s2=1;
         }
-        if(interestCodeList1.contains("1000") && interestCodeList2.contains("1000")){
+        if(interestCodeList1.startsWith("10") && interestCodeList2.startsWith("10")){
             e1=1;
         }
        if(s1==0 &&s2==0 &&e1==0){
-           if(interestCodeList1.contains("0000") || interestCodeList2.contains("0000")){
+           if(interestCodeList1.startsWith("00") || interestCodeList2.startsWith("00")){
                s1=1;
            }
-           if(interestCodeList1.contains("0100") || interestCodeList2.contains("0100")){
+           if(interestCodeList1.startsWith("01") || interestCodeList2.startsWith("01")){
                s2=1;
            }
-           if(interestCodeList1.contains("1000") || interestCodeList2.contains("1000")){
+           if(interestCodeList1.startsWith("10") || interestCodeList2.startsWith("10")){
                e1=1;
            }
        }
@@ -87,6 +87,7 @@ public class AssistedChatController {
             wrapper.orderByDesc(Assistedchat::getId);
              res2 = assistedChatMapper.selectList(wrapper);
         }
+        e1=1;
         if(e1==1){
             LambdaQueryWrapper<Assistedchat> wrapper= new LambdaQueryWrapper<>();
             wrapper.eq(Assistedchat::getType,"entertainment");

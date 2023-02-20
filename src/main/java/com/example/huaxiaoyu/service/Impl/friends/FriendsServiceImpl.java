@@ -46,7 +46,6 @@ public class FriendsServiceImpl extends ServiceImpl<FriendsMapper, Friends> impl
             if(f.getStatus()==1){
                 User user = userMapper.selectById(f.getReceiveId());
                 user.setPassword(null);
-
                 res.add(user);
             }
         }
