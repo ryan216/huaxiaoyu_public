@@ -1,17 +1,15 @@
-# huaxiaoyu_public
+# huaxiaoyu
 
-# 数据库
-mysql8.0:
-1.自行安装好mysql8.0，用户名密码根据情况更改application.yml文件
-2.建库create database huaxiaoyu charset=utf8mb4;
-3.执行huaxiaoyu分支下sql：source huaxioayu.sql
+# database
+wget -i -c http://dev.mysql.com/get/mysgl57-community-release-el7-10noarchrpm
+sudo yum -y install mysql57-community-release-el7-10.noarch.rpm
+sudo yum -y install mysql-community-client
+mysql -u root -pxxxxx -e "create database huaxiaoyu default character set utf8mb4 collate utf8mb4 unicode ci
+apt-get install redis
+service redis start
 
-redis:
-1.安装redis5.0
-2.开启服务
+# back
+1.mvn package huaxiaoyu   nohup java -jar huaxiaoyu.jar &
+2.mvn package crushingsystem  nohup java -jar crushingsystem &
 
-# 后端服务
-1.maven打包后 java -jar方式运行即可
-2.源码位于huaxiaoyu分支和crushing_system分支
-3.两个服务hauxioayu和crushingsystem均需单独以方式1开启服务
 
